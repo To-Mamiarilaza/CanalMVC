@@ -1,0 +1,138 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+<div class="text-center">
+    <div class="row">
+        <div class="col-md-2 mt-3">
+            <form action='@Url.Action("Index", "Home")' method="POST" class="form select">
+                <div class="form-group mt-3">
+                    <label for="name">Sélectionner un client</label>
+                    <select class="form-select mt-3" name="idClient">
+                        @foreach (ClientModel client in (ClientModel[])ViewData["clients"])
+                        {
+                            <option value="@client.IdClient">@client.Nom</option>
+                        }
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-info mt-3">Valider</button>
+            </form>
+
+            @if (ViewData.ContainsKey("currentClient"))
+            {
+                ClientModel currentClient = (ClientModel)@ViewData["currentClient"];
+                RegionModel[] regions = (RegionModel[])@ViewData["regions"];
+                <p class="mt-5" style="font-size: 13px;"><strong>Changer region pour ce client</strong> </p>
+                <form action='@Url.Action("updateRegion", "Home")' method="POST">
+                    <input type="hidden" name="idClient" value="@currentClient.IdClient">
+                    <select name="idRegion" id="" class="form-select">
+                        @foreach (RegionModel reg in regions)
+                        {
+                            <option value="@reg.IdRegion">@reg.Nom</option>
+                        }
+                    </select>
+                    <input type="submit" class="btn btn-success mt-3">
+                </form>
+            }
+        </div>
+
+        <div class="col-md-10">
+            @if (ViewData.ContainsKey("currentClient"))
+            {
+                ClientModel currentClient = (ClientModel)@ViewData["currentClient"];
+                BouquetModel[] bouquets = (BouquetModel[])@ViewData["bouquets"];
+                ChaineModel[] listesChaines = ChaineModel.getAvailableChaine(currentClient.Region);
+
+                <div class="detail">
+                    <p>Detail du client : <strong>@currentClient.Nom</strong> </p>
+                    <p>Region : <strong>@currentClient.Region.Nom</strong>  - Signale de reception : <strong>@currentClient.Region.Reception</strong>  </p>
+                </div>
+                <div class="abonnement">
+                    <h5>Listes des Abonnement de @currentClient.Nom</h5>
+                    <table class="table">
+                        <tr>
+                            <th>Début</th>
+                            <th>Fin</th>
+                            <th>Bouquet</th>
+                        </tr>
+                        @foreach (AbonnementModel abs in currentClient.Abonnements)
+                        {
+                            <tr>
+                                <td>@abs.DateDebut.ToString("yyyy - MM - dd")</td>
+                                <td>@abs.DateFin.ToString("yyyy - MM - dd")</td>
+                                <td>@abs.Bouquet.Nom</td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+
+                @* Les bouquets pour le clients *@
+                <hr>
+                <h4 class="mt-5">Les bouquets disponible pour ce client</h4>
+                <a class="btn btn-info my-3" data-bs-toggle="modal" data-bs-target="#exampleModal"> Nouveau Bouquet spécial </a>
+
+                <!-- Modal -->
+                <form action='@Url.Action("newSpecialBouquet", "Home")' method="POST">
+                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Nouveau Bouquet spécial</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="idClient" value="@currentClient.IdClient">
+                            <div class="enter-group mb-3">
+                                <label for="nom"><strong>Nom du bouquet</strong></label>
+                                <input type="text" id="nom" name="nomBouquet" class="form-control" required>
+                            </div>
+                            <p><strong>Listes des chaines disponible</strong> </p>
+                            <div class="listeChaines">
+                                @foreach (ChaineModel chaine in listesChaines)
+                                {
+                                    <div class="chaineDetail">
+                                        <input type="checkbox" id="chaineDetail" name="chaines" value="@chaine.IdChaine">
+                                        <label for="chaineDetail">@chaine.Nom : <span class="price">@chaine.Prix Ar</span></label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                </form>
+
+                <div class="row mt-3">
+                    @foreach (BouquetModel bouquet in bouquets)
+                    {
+                        ChaineModel[] chaines = bouquet.Chaines;
+                        <div class="col-md-4 bouquet mt-3">
+                            <h6>Bouquet : @bouquet.Nom</h6>
+                            <ul>
+                                @foreach (ChaineModel chaine in chaines)
+                                {
+                                    <li>@chaine.Nom <span class="reception">@chaine.MinSignal</span></li>
+                                }
+                                <p class="mt-3">Prix sans remise : @bouquet.PrixSansRemise  Ar</p>
+                                <p class="mt-3">Prix : @bouquet.Prix  Ar <span>-</span> <span class="remise">@bouquet.Remise %</span></p>
+                                <form action='@Url.Action("newAbonnement", "Home")' method="POST">
+                                    <div class="input-group">
+                                        <input type="hidden" name="idBouquet" value="@bouquet.IdBouquet" required>
+                                        <input type="hidden" name="idClient" value="@currentClient.IdClient" required>
+                                        <input type="number" class="form-control" name="duree" placeholder="Mois" min="1" required>
+                                        <input type="submit" class="btn btn-info" value="Valider">
+                                    </div>
+                                </form>
+                            </ul>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

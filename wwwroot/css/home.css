@@ -1,0 +1,82 @@
+
+.select {
+    text-align: left;
+    padding-left: 30px;
+}
+
+.detail {
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+.detail p {
+    margin: 5px;
+}
+
+.reception {
+    color: rgb(163, 99, 235);
+    font-size: 10px;
+    margin-left: 8px;
+}
+
+.remise {
+    color: rgb(248, 86, 86);
+    font-size: 10px;
+}
+
+.bouquet li {
+    display: flex;
+    justify-content: space-between;
+}
+
+.bouquet p {
+    display: flex;
+    justify-content: space-between;
+}
+
+.bouquet a {
+    text-align: left;
+}
+
+.input-group {
+    display: flex;
+    justify-content: space-between;
+}
+
+.input-group input {
+    width: 30%;
+    margin-right: 10%;
+}
+
+.abonnement {
+    width: 70%;
+    font-size: 14px;
+    text-align: left;
+    margin-left: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.chaineDetail {
+    text-align: left;
+}
+
+.chaineDetail input {
+    margin-right: 30px;
+}
+
+.price {
+    color: rgb(248, 86, 86);
+    font-size: 14px;
+}
+
+.enter-group {
+}
+
+.enter-group input {
+    width: 50%;
+    margin-top: 15px;
+    margin-left: auto;
+    margin-right: auto;
+}
